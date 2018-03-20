@@ -1,0 +1,75 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'eu.snarf'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 9
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	integrationTest {
+		java {
+			// So that we can compile against the business classes (GreeterService, ...):
+			compileClasspath += main.output
+			// So that we can compile against the libs used by the business classes:
+			compileClasspath += main.compileClasspath
+			// So that we can compile against the unit test classes (custom utilities fx):
+			compileClasspath += test.output
+			// So that we can compile against the libs used by the unit test classes (JUnit, Spring test support, ...):
+			compileClasspath += test.compileClasspath
+			// So that test- and business classes can be used at runtime:
+			runtimeClasspath += test.runtimeClasspath
+			srcDir file('src/integration-test/java')
+		}
+		resources.srcDir file('src/integration-test/resources')
+	}
+}
+
+configurations {
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-validation')
+	compile('org.springframework.boot:spring-boot-starter-web')
+
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	runtime('com.h2database:h2')
+
+
+
+	// http://swagger.io/
+	compile('io.springfox:springfox-swagger2:2.6.1')
+	compile('io.springfox:springfox-swagger-ui:2.6.1')
+
+	compileOnly('org.projectlombok:lombok:1.16.20')
+	compile('org.slf4j:slf4j-api:1.7.25')
+
+	// Not in JDK 9 anymore
+	compile('javax.xml.bind:jaxb-api:2.3.0')
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	//Integration test
+	integrationTestCompile 'io.rest-assured:rest-assured:3.0.6'
+}

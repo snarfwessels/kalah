@@ -1,0 +1,13 @@
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+spring:
+  application:
+    name: kalahApp
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: create
